@@ -120,6 +120,14 @@ def _get_instrumentation_settings(config):
     instrumentation = config.get('instrumentation', {})
     return instrumentation
 
+def _get_dashboard_settings(config):
+    if 'dashboard' not in config:
+        raise InvalidYAMLConfigException('Failed to find dashboard parameter in the YAML.')
+    dashboard = config['dashboard']
+    expected_parameters = ['update_dashboard', 'dashboard_update_url', 'dashboard_api_key']
+    _check_parameters(parameter=dashboard, expected_parameters=expected_parameters, parameter_type='dashboard')
+    return dashboard
+
 
 def _check_parameters(parameter, expected_parameters, parameter_type):
     failed_checks = []
@@ -147,7 +155,8 @@ def get_config_info():
     notification_settings = _get_notifications_settings(config=config)
     view_settings = _get_view_settings(config=config)
     instrumentation_settings = _get_instrumentation_settings(config=config)
+    dashboard_settings = _get_dashboard_settings(config=config)
 
     return chia_location, log_directory, jobs, manager_check_interval, max_concurrent, max_for_phase_1, \
         minimum_minutes_between_jobs, progress_settings, notification_settings, log_level, view_settings, \
-        instrumentation_settings
+        instrumentation_settings, dashboard_settings
