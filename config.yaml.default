@@ -41,6 +41,16 @@ view:
   include_ram: true
   include_plot_stats: true
 
+dashboard:
+# These are the settings to have the plot manager report jobs to the Chia Dashboard (https://chiadashboard.com)
+#
+# dashboard_update_url: This can be changed to point anywhere running Chia Dashboard. If using chiadashboard.com,
+#                       choose https://us.chiadashboard.com or https://eu.chiadashboard.com based on your location.
+#       
+update_dashboard: false
+dashboard_update_url: https://us.chiadashboard.com
+dashboard_api_key: XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+
 
 notifications:
   # These are different settings in order to notified when the plot manager starts and when a plot has been completed.
