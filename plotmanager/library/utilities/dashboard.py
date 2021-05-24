@@ -25,16 +25,16 @@ def dashboard_thread():
 
 
 def update_dashboard():
-    analysis = {'files': {}}
-    running_work = {}
-    analysis = analyze_log_dates(log_directory=log_directory, analysis=analysis)
-    jobs = load_jobs(config_jobs)
-    jobs, running_work = get_running_plots(jobs=jobs, running_work=running_work, instrumentation_settings=instrumentation_settings)
-    check_log_progress(jobs=jobs, running_work=running_work, progress_settings=progress_settings,
-                        notification_settings=notification_settings, view_settings=view_settings, instrumentation_settings=instrumentation_settings)
-    get_job_data(jobs=jobs, running_work=running_work, analysis=analysis)
-    time.sleep(60) #setting this too low can cause problems. recommended 60
-    update_dashboard()
+    while True:
+        analysis = {'files': {}}
+        running_work = {}
+        analysis = analyze_log_dates(log_directory=log_directory, analysis=analysis)
+        jobs = load_jobs(config_jobs)
+        jobs, running_work = get_running_plots(jobs=jobs, running_work=running_work, instrumentation_settings=instrumentation_settings)
+        check_log_progress(jobs=jobs, running_work=running_work, progress_settings=progress_settings,
+                            notification_settings=notification_settings, view_settings=view_settings, instrumentation_settings=instrumentation_settings)
+        get_job_data(jobs=jobs, running_work=running_work, analysis=analysis)
+        time.sleep(60) #setting this too low can cause problems. recommended 60
 
 def get_job_data(jobs, running_work, analysis):
     rows = []
