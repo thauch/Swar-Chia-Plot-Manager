@@ -47,7 +47,7 @@ dashboard:
   # dashboard_update_url: This can be changed to point anywhere running Chia Dashboard. If using chiadashboard.com,
   #                       choose https://us.chiadashboard.com or https://eu.chiadashboard.com based on your location.
   #       
-  update_dashboard: false
+  update_dashboard: true
   dashboard_update_url: https://us.chiadashboard.com
   dashboard_api_key: XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
 
