@@ -1,4 +1,5 @@
 import os
+import psutil
 import json
 import requests
 import threading
@@ -10,8 +11,9 @@ from requests.exceptions import HTTPError
 from plotmanager.library.parse.configuration import get_config_info
 from plotmanager.library.utilities.jobs import load_jobs
 from plotmanager.library.utilities.log import analyze_log_dates, check_log_progress
-from plotmanager.library.utilities.processes import get_running_plots
-from plotmanager.library.utilities.print import _get_row_info
+from plotmanager.library.utilities.processes import is_windows, get_manager_processes, get_running_plots, \
+    start_process, identify_drive, get_system_drives
+from plotmanager.library.utilities.print import _get_row_info, pretty_print_bytes
 
 chia_location, log_directory, config_jobs, manager_check_interval, max_concurrent, max_for_phase_1, \
     minimum_minutes_between_jobs, progress_settings, notification_settings, debug_level, view_settings, \
@@ -30,13 +32,15 @@ def update_dashboard():
         running_work = {}
         analysis = analyze_log_dates(log_directory=log_directory, analysis=analysis)
         jobs = load_jobs(config_jobs)
+
         jobs, running_work = get_running_plots(jobs=jobs, running_work=running_work, instrumentation_settings=instrumentation_settings)
         check_log_progress(jobs=jobs, running_work=running_work, progress_settings=progress_settings,
                             notification_settings=notification_settings, view_settings=view_settings, instrumentation_settings=instrumentation_settings)
-        get_job_data(jobs=jobs, running_work=running_work, analysis=analysis)
+        job_data = get_job_data(jobs=jobs, running_work=running_work)
+        dashboard_request(plots = job_data, analysis=analysis)
         time.sleep(60) #setting this too low can cause problems. recommended 60
 
-def get_job_data(jobs, running_work, analysis):
+def get_job_data(jobs, running_work):
     rows = []
     added_pids = []
     for job in jobs:
@@ -53,7 +57,7 @@ def get_job_data(jobs, running_work, analysis):
     rows.sort(key=lambda x: (x[4]), reverse=True)
     for i in range(len(rows)):
         rows[i] = [str(i+1)] + rows[i]
-    dashboard_request(plots = rows, analysis=analysis)
+    return rows
 
 def _get_row_info(pid, running_work):
     work = running_work[pid]
@@ -76,6 +80,7 @@ def _get_row_info(pid, running_work):
     ]
     return [str(cell) for cell in row]
 
+
 def set_dashboard_data(plots):
     data = []
     for plot in plots:
@@ -91,9 +96,11 @@ def set_dashboard_data(plots):
     return data
 
 def dashboard_request(plots, analysis):
-
+    ram_usage = psutil.virtual_memory()
     data = {
         "plotter": {
+            "cpu": str(round(psutil.cpu_percent())) + "%",
+            "ram": str(round(ram_usage.percent)) + "%",
             "completedPlotsToday": analysis["summary"].get(datetime.now().date(), 0),
             "completedPlotsYesterday": analysis["summary"].get(datetime.now().date() - timedelta(days=1), 0),
             "jobs": set_dashboard_data(plots)
