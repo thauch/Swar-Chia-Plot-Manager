@@ -54,7 +54,7 @@ def get_job_data(jobs, running_work):
             continue
         rows.append(_get_row_info(pid, running_work))
         added_pids.append(pid)
-    rows.sort(key=lambda x: (x[4]), reverse=True)
+    rows.sort(key=lambda x: (float(x[7][:-1])), reverse=True)
     for i in range(len(rows)):
         rows[i] = [str(i+1)] + rows[i]
     return rows
