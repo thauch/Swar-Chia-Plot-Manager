@@ -189,18 +189,18 @@ def dashboard_request(plots, drives, analysis):
             logging.info(dashboard_status)
         elif  response.status_code == 429:
             dashboard_status = "[Dashboard] Too many Requests. Slow down."
-            logging.ERROR(dashboard_status + str(response))
+            logging.error(dashboard_status + str(response))
         else:
             response.raise_for_status()
     except HTTPError:
         if response.status_code == 401:
             dashboard_status = "[Dashboard] Unauthorized. Possibly invalid API key?"
-            logging.ERROR(dashboard_status + str(response))
+            logging.error(dashboard_status + str(response))
         else:
             dashboard_status = "[Dashboard] Unable to connect."
-            logging.ERROR(dashboard_status + str(response))
+            logging.error(dashboard_status + str(response))
     except requests.exceptions.ConnectionError:
         dashboard_status = "[Dashboard] Connection Error. Chiadashboard.com may not be responding."
-        logging.ERROR(dashboard_status)
+        logging.error(dashboard_status)
     return dashboard_status
         
