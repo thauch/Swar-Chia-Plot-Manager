@@ -18,8 +18,6 @@ chia_location, log_directory, config_jobs, manager_check_interval, max_concurren
     minimum_minutes_between_jobs, progress_settings, notification_settings, debug_level, view_settings, \
     instrumentation_settings, dashboard_settings = get_config_info()
 
-#logging.basicConfig(filename='debug.log', format='%(asctime)s:%(message)s', datefmt='%Y-%m-%d %H:%M:%S', level=logging.WARNING)
-
 def dashboard_thread():
     newThread = threading.Thread(target=update_dashboard, args=())
     newThread.start()
