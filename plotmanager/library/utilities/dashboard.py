@@ -18,7 +18,7 @@ chia_location, log_directory, config_jobs, manager_check_interval, max_concurren
     minimum_minutes_between_jobs, progress_settings, notification_settings, debug_level, view_settings, \
     instrumentation_settings, dashboard_settings = get_config_info()
 
-logging.basicConfig(filename='dashboard.log', format='%(asctime)s:%(message)s', datefmt='%Y-%m-%d %H:%M:%S', level=logging.WARNING, force=True)
+#logging.basicConfig(filename='debug.log', format='%(asctime)s:%(message)s', datefmt='%Y-%m-%d %H:%M:%S', level=logging.WARNING)
 
 def dashboard_thread():
     newThread = threading.Thread(target=update_dashboard, args=())
@@ -187,21 +187,22 @@ def dashboard_request(plots, drives, analysis):
     try:
         response = requests.patch(url + '/api/satellite', headers=headers, data=data)
         if response.status_code == 204:
-            dashboard_status = "Connected"
+            dashboard_status = "[Dashboard] Connected"
+            logging.info(dashboard_status)
         elif  response.status_code == 429:
-            dashboard_status = "Too many Requests. Slow down."
+            dashboard_status = "[Dashboard] Too many Requests. Slow down."
             logging.warning(dashboard_status + str(response))
         else:
             response.raise_for_status()
     except HTTPError:
         if response.status_code == 401:
-            dashboard_status = "Unauthorized. Possibly invalid API key?"
+            dashboard_status = "[Dashboard] Unauthorized. Possibly invalid API key?"
             logging.warning(dashboard_status + str(response))
         else:
-            dashboard_status = "Unable to connect."
+            dashboard_status = "[Dashboard] Unable to connect."
             logging.warning(dashboard_status + str(response))
     except requests.exceptions.ConnectionError:
-        dashboard_status = "Connection Error. Chiadashboard.com may not be responding."
+        dashboard_status = "[Dashboard] Connection Error. Chiadashboard.com may not be responding."
         logging.warning(dashboard_status)
     return dashboard_status
         
