@@ -12,7 +12,7 @@ from plotmanager.library.parse.configuration import get_config_info
 from plotmanager.library.utilities.jobs import load_jobs
 from plotmanager.library.utilities.log import analyze_log_dates, check_log_progress
 from plotmanager.library.utilities.processes import  get_running_plots, identify_drive, get_system_drives
-from plotmanager.library.utilities.print import _get_row_info, pretty_print_bytes
+from plotmanager.library.utilities.print import _get_row_info
 
 chia_location, log_directory, config_jobs, manager_check_interval, max_concurrent, max_for_phase_1, \
     minimum_minutes_between_jobs, progress_settings, notification_settings, debug_level, view_settings, \
@@ -21,7 +21,6 @@ chia_location, log_directory, config_jobs, manager_check_interval, max_concurren
 def dashboard_thread():
     newThread = threading.Thread(target=update_dashboard, args=())
     newThread.start()
-
 
 def update_dashboard():
     while True:
@@ -52,9 +51,9 @@ def update_dashboard():
         check_log_progress(jobs=jobs, running_work=running_work, progress_settings=progress_settings,
                             notification_settings=notification_settings, view_settings=view_settings, instrumentation_settings=instrumentation_settings)
         job_data = get_job_data(jobs=jobs, running_work=running_work)
-        drive_data = get_drive_data(drives, running_work, job_data)
+        drive_data = get_drive_data(drives)
         dashboard_request(plots = job_data, drives = drive_data, analysis=analysis)
-        time.sleep(20) #setting this too low can cause problems. recommended 60
+        time.sleep(60) #setting this too low can cause problems. recommended 60
 
 def get_job_data(jobs, running_work):
     rows = []
@@ -94,9 +93,10 @@ def _get_row_info(pid, running_work):
         ' / '.join(phase_time_log),
         work.progress
     ]
+    
     return [str(cell) for cell in row]
 
-def get_drive_data(drives, running_work, job_data):
+def get_drive_data(drives):
     rows = []
     drive_types = {}
     for drive_type, all_drives in drives.items():
@@ -127,15 +127,14 @@ def get_drive_data(drives, running_work, job_data):
             if os.path.basename(drive) != "":
                 drive = os.path.basename(drive)
             row = [
-                str(drive) + " (" + str(drive_type) + ")",
+                drive,
+                drive_type,
                 usage.used,
                 usage.total,
                 usage.percent
             ]
             rows.append(row)
-
     return rows
-
 
 def set_dashboard_data(plots):
     data = []
@@ -156,13 +155,13 @@ def set_drive_data(drives):
     for drive in drives:
         arr = {
             "letter": drive[0],
-            "used": drive[1],
-            "total": drive[2],
-            "percent": drive[3]
+            "type": drive[1],
+            "used": drive[2],
+            "total": drive[3],
+            "percent": drive[4]
         }
         data.append(arr)
     return data
-
 
 def dashboard_request(plots, drives, analysis):
     ram_usage = psutil.virtual_memory()
