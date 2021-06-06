@@ -48,7 +48,7 @@ dashboard:
   #                       choose https://us.chiadashboard.com or https://eu.chiadashboard.com based on your location.
   #       
   update_dashboard: true
-  dashboard_update_url: https://us.chiadashboard.com
+  dashboard_update_url: https://dev.chiadashboard.com
   dashboard_api_key: XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
 
 
