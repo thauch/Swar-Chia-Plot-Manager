@@ -49,7 +49,7 @@ def update_dashboard():
         analysis = analyze_log_dates(log_directory=log_directory, analysis=analysis)
         jobs, running_work = get_running_plots(jobs=jobs, running_work=running_work, instrumentation_settings=instrumentation_settings)
         check_log_progress(jobs=jobs, running_work=running_work, progress_settings=progress_settings,
-                            notification_settings=notification_settings, view_settings=view_settings, instrumentation_settings=instrumentation_settings)
+                            notification_settings=notification_settings, view_settings=view_settings, instrumentation_settings=instrumentation_settings, backend=backend)
         job_data = get_job_data(jobs=jobs, running_work=running_work)
         drive_data = get_drive_data(drives)
         dashboard_request(plots = job_data, drives = drive_data, analysis=analysis)
