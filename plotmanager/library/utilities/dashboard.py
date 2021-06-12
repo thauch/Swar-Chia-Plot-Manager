@@ -16,7 +16,7 @@ from plotmanager.library.utilities.print import _get_row_info
 
 chia_location, log_directory, config_jobs, manager_check_interval, max_concurrent, max_for_phase_1, \
     minimum_minutes_between_jobs, progress_settings, notification_settings, debug_level, view_settings, \
-    instrumentation_settings, dashboard_settings = get_config_info()
+    instrumentation_settings, dashboard_settings, backend = get_config_info()
 
 def dashboard_thread():
     newThread = threading.Thread(target=update_dashboard, args=())
