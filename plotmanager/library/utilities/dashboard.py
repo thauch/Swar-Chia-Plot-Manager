@@ -11,16 +11,18 @@ from requests.exceptions import HTTPError
 from plotmanager.library.parse.configuration import get_config_info
 from plotmanager.library.utilities.jobs import load_jobs
 from plotmanager.library.utilities.log import analyze_log_dates, check_log_progress
-from plotmanager.library.utilities.processes import  get_running_plots, identify_drive, get_system_drives
+from plotmanager.library.utilities.processes import get_running_plots, identify_drive, get_system_drives
 from plotmanager.library.utilities.print import _get_row_info
 
 chia_location, log_directory, config_jobs, manager_check_interval, max_concurrent, max_for_phase_1, \
-    minimum_minutes_between_jobs, progress_settings, notification_settings, debug_level, view_settings, \
-    instrumentation_settings, dashboard_settings, backend = get_config_info()
+minimum_minutes_between_jobs, progress_settings, notification_settings, debug_level, view_settings, \
+instrumentation_settings, dashboard_settings, backend = get_config_info()
+
 
 def dashboard_thread():
     newThread = threading.Thread(target=update_dashboard, args=())
     newThread.start()
+
 
 def update_dashboard():
     while True:
@@ -45,15 +47,18 @@ def update_dashboard():
                     if drive in drives[key]:
                         continue
                     drives[key].append(drive)
-        
+
         analysis = analyze_log_dates(log_directory=log_directory, analysis=analysis)
-        jobs, running_work = get_running_plots(jobs=jobs, running_work=running_work, instrumentation_settings=instrumentation_settings, backend=backend)
+        jobs, running_work = get_running_plots(jobs=jobs, running_work=running_work,
+                                               instrumentation_settings=instrumentation_settings, backend=backend)
         check_log_progress(jobs=jobs, running_work=running_work, progress_settings=progress_settings,
-                            notification_settings=notification_settings, view_settings=view_settings, instrumentation_settings=instrumentation_settings, backend=backend)
+                           notification_settings=notification_settings, view_settings=view_settings,
+                           instrumentation_settings=instrumentation_settings, backend=backend)
         job_data = get_job_data(jobs=jobs, running_work=running_work, backend=backend)
         drive_data = get_drive_data(drives)
-        dashboard_request(plots = job_data, drives = drive_data, analysis=analysis)
-        time.sleep(60) #setting this too low can cause problems. recommended 60
+        dashboard_request(plots=job_data, drives=drive_data, analysis=analysis)
+        time.sleep(60)  # setting this too low can cause problems. recommended 60
+
 
 def get_job_data(jobs, running_work, backend='chia'):
     rows = []
@@ -71,8 +76,9 @@ def get_job_data(jobs, running_work, backend='chia'):
         added_pids.append(pid)
     rows.sort(key=lambda x: (float(x[7][:-1])), reverse=True)
     for i in range(len(rows)):
-        rows[i] = [str(i+1)] + rows[i]
+        rows[i] = [str(i + 1)] + rows[i]
     return rows
+
 
 def _get_row_info(pid, running_work, backend='chia'):
     work = running_work[pid]
@@ -93,8 +99,9 @@ def _get_row_info(pid, running_work, backend='chia'):
         ' / '.join(phase_time_log),
         work.progress
     ]
-    
+
     return [str(cell) for cell in row]
+
 
 def get_drive_data(drives):
     rows = []
@@ -136,6 +143,7 @@ def get_drive_data(drives):
             rows.append(row)
     return rows
 
+
 def set_dashboard_data(plots):
     data = []
     for plot in plots:
@@ -145,10 +153,11 @@ def set_dashboard_data(plots):
             "state": "RUNNING",
             "kSize": plot[2],
             "phase": plot[6],
-            "progress": float(plot[8].strip('%'))/100
+            "progress": float(plot[8].strip('%')) / 100
         }
         data.append(arr)
     return data
+
 
 def set_drive_data(drives):
     data = []
@@ -162,6 +171,7 @@ def set_drive_data(drives):
         }
         data.append(arr)
     return data
+
 
 def dashboard_request(plots, drives, analysis):
     ram_usage = psutil.virtual_memory()
@@ -186,7 +196,7 @@ def dashboard_request(plots, drives, analysis):
         if response.status_code == 204:
             dashboard_status = "[Dashboard] Connected"
             logging.info(dashboard_status)
-        elif  response.status_code == 429:
+        elif response.status_code == 429:
             dashboard_status = "[Dashboard] Too many Requests. Slow down."
             logging.error(dashboard_status + str(response))
         else:
@@ -202,4 +212,3 @@ def dashboard_request(plots, drives, analysis):
         dashboard_status = "[Dashboard] Connection Error. Chiadashboard.com may not be responding."
         logging.error(dashboard_status)
     return dashboard_status
-        

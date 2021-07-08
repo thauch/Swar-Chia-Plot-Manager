@@ -10,11 +10,9 @@ from plotmanager.library.utilities.log import check_log_progress
 from plotmanager.library.utilities.processes import get_running_plots, get_system_drives
 from plotmanager.library.utilities.dashboard import dashboard_thread
 
-
 chia_location, log_directory, config_jobs, manager_check_interval, max_concurrent, max_for_phase_1, \
-    minimum_minutes_between_jobs, progress_settings, notification_settings, debug_level, view_settings, \
-    instrumentation_settings, dashboard_settings, backend = get_config_info()
-
+minimum_minutes_between_jobs, progress_settings, notification_settings, debug_level, view_settings, \
+instrumentation_settings, dashboard_settings, backend = get_config_info()
 
 logging.basicConfig(format='%(asctime)s [%(levelname)s]: %(message)s', datefmt='%Y-%m-%d %H:%M:%S', level=debug_level)
 

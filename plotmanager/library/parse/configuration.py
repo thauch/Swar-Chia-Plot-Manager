@@ -2,7 +2,6 @@ import pathlib
 import os
 import yaml
 
-
 from plotmanager.library.utilities.exceptions import InvalidYAMLConfigException
 
 
@@ -108,7 +107,8 @@ def _get_view_settings(config):
     if 'view' not in config:
         raise InvalidYAMLConfigException('Failed to find view parameter in the YAML.')
     view = config['view']
-    expected_parameters = ['datetime_format', 'include_seconds_for_phase', 'include_drive_info', 'include_cpu', 'include_ram',
+    expected_parameters = ['datetime_format', 'include_seconds_for_phase', 'include_drive_info', 'include_cpu',
+                           'include_ram',
                            'include_plot_stats', 'check_interval']
     _check_parameters(parameter=view, expected_parameters=expected_parameters, parameter_type='view')
     return view
@@ -119,6 +119,7 @@ def _get_instrumentation_settings(config):
         raise InvalidYAMLConfigException('Failed to find instrumentation parameter in the YAML.')
     instrumentation = config.get('instrumentation', {})
     return instrumentation
+
 
 def _get_dashboard_settings(config):
     if 'dashboard' not in config:
@@ -163,5 +164,5 @@ def get_config_info():
     dashboard_settings = _get_dashboard_settings(config=config)
 
     return chia_location, log_directory, jobs, manager_check_interval, max_concurrent, max_for_phase_1, \
-        minimum_minutes_between_jobs, progress_settings, notification_settings, log_level, view_settings, \
-        instrumentation_settings, dashboard_settings, backend
+           minimum_minutes_between_jobs, progress_settings, notification_settings, log_level, view_settings, \
+           instrumentation_settings, dashboard_settings, backend
