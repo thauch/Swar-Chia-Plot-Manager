@@ -78,9 +78,10 @@ def _get_madmax_flags(temporary_directory, destination_directory, threads, bucke
         flags['2'] = temporary2_directory
     if farmer_public_key is not None:
         flags['f'] = farmer_public_key
-    if pool_public_key is not None:
-        flags['p'] = pool_public_key
     if pool_contract_address is not None:
         flags['c'] = pool_contract_address
+    elif pool_public_key is not None:
+        flags['p'] = pool_public_key
+
 
     return flags
