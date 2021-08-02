@@ -16,7 +16,7 @@ from plotmanager.library.utilities.print import _get_row_info
 
 chia_location, log_directory, config_jobs, manager_check_interval, max_concurrent, max_for_phase_1, \
     minimum_minutes_between_jobs, progress_settings, notification_settings, debug_level, view_settings, \
-    instrumentation_settings, dashboard_settings = get_config_info()
+    instrumentation_settings, dashboard_settings, backend = get_config_info()
 
 def dashboard_thread():
     newThread = threading.Thread(target=update_dashboard, args=())
@@ -47,27 +47,27 @@ def update_dashboard():
                     drives[key].append(drive)
         
         analysis = analyze_log_dates(log_directory=log_directory, analysis=analysis)
-        jobs, running_work = get_running_plots(jobs=jobs, running_work=running_work, instrumentation_settings=instrumentation_settings)
+        jobs, running_work = get_running_plots(jobs=jobs, running_work=running_work, instrumentation_settings=instrumentation_settings, backend=backend)
         check_log_progress(jobs=jobs, running_work=running_work, progress_settings=progress_settings,
-                            notification_settings=notification_settings, view_settings=view_settings, instrumentation_settings=instrumentation_settings)
-        job_data = get_job_data(jobs=jobs, running_work=running_work)
+                            notification_settings=notification_settings, view_settings=view_settings, instrumentation_settings=instrumentation_settings, backend=backend)
+        job_data = get_job_data(jobs=jobs, running_work=running_work, backend=backend)
         drive_data = get_drive_data(drives)
         dashboard_request(plots = job_data, drives = drive_data, analysis=analysis)
         time.sleep(60) #setting this too low can cause problems. recommended 60
 
-def get_job_data(jobs, running_work):
+def get_job_data(jobs, running_work, backend='chia'):
     rows = []
     added_pids = []
     for job in jobs:
         for pid in job.running_work:
             if pid not in running_work:
                 continue
-            rows.append(_get_row_info(pid, running_work))
+            rows.append(_get_row_info(pid, running_work, backend))
             added_pids.append(pid)
     for pid in running_work.keys():
         if pid in added_pids:
             continue
-        rows.append(_get_row_info(pid, running_work))
+        rows.append(_get_row_info(pid, running_work, backend))
         added_pids.append(pid)
     try: 
         rows.sort(key=lambda x: (float(x[7][:-1])), reverse=True)
@@ -77,7 +77,7 @@ def get_job_data(jobs, running_work):
         rows[i] = [str(i+1)] + rows[i]
     return rows
 
-def _get_row_info(pid, running_work):
+def _get_row_info(pid, running_work, backend='chia'):
     work = running_work[pid]
     phase_times = work.phase_times
     elapsed_time = (datetime.now() - work.datetime_start)
